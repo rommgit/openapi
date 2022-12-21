@@ -1,0 +1,1248 @@
+openapi: 3.0.3
+info:
+  title: correspondence
+  description: 'Servicio encargado del envío de correspondencia.'
+  version: '1.0'
+servers:
+  - url: "http://api-dns.grupopromerica.com/correspondence/api/v1"
+paths:
+  /channels/all/send:
+    post:
+      summary: SendCorrespondence
+      description: 'Envía correspondencia por uno o varios canales electrónicos, como SMS y correo electrónico. Pueden ser notificaciones, campañas de ventas, anuncios, etc.'
+      operationId: sendcorrespondence
+      tags:
+        - Correspondence
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Idioma
+          required: true
+          schema:
+            enum:
+              - es
+              - en
+              - es-CR
+              - es-NI
+              - es-GT
+              - es-HN
+              - es-PA
+              - es-DO
+              - es-SV
+              - es-KY
+              - es-EC
+              - en-CR
+              - en-NI
+              - en-GT
+              - en-HN
+              - en-PA
+              - en-DO
+              - en-SV
+              - en-KY
+              - en-EC
+            type: string
+        - name: X-Origin-IP-Address
+          in: header
+          description: IP que originó el request al servicio.
+          required: true
+          schema:
+            type: string
+            format: ipv4, ipv6
+        - name: X-Subscription-Id
+          in: header
+          description: Identificador del sistema.
+          required: true
+          schema:
+            type: string
+        - name: X-Transaction-Id
+          in: header
+          description: Identificador único de la transacción.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 38
+        - name: X-User-Code
+          in: header
+          description: Código de usuario que utiliza el cliente que realiza el request. O bien, valores que permitan identificar usuario (persona o sistema) de una solicitud.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 50
+        - name: X-Origin-Country
+          in: header
+          description: Código de país a 2 caracteres según estándar ISO 3166-1 alfa-2.
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            enum:
+              - CR
+              - NI
+              - GT
+              - HN
+              - PA
+              - DO
+              - SV
+              - KY
+              - EC
+        - name: X-Origin-MachineName
+          in: header
+          description: Nombre del servidor/maquina en donde se inicia el request.
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 255
+        - name: X-Point-Coordinates
+          in: header
+          description: Localización en donde el usuario final realiza el evento. El formato esperado es GPS ISO 6709.
+          required: false
+          schema:
+            type: string
+            minLength: 20
+            maxLength: 23
+        - name: X-Kony-Api-Version
+          in: header
+          description: Versión de API que se está consumiendo. Requerido en servicios publicados en Quantum Fabric.
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 6
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendCorrespondence_Request_01'
+            example:
+              systemModuleCode: AC
+              correspondence:
+                emailChannel:
+                  bulkEmail:
+                    from:
+                      name: Nombre1 Apellido1
+                      emailAddress: correo1@dominio.com
+                    subject:
+                      subject: Asunto de prueba
+                      template:
+                        name: BULKSUBJTMP001
+                      metadata:
+                        - key: DiaSemana
+                          value: Lunes
+                    body:
+                      body: <p>Body de prueba</p>
+                      template:
+                        name: BULKBODYTMP001
+                      metadata:
+                        - key: Animal
+                          value: León
+                    attachments:
+                      - name: ABC058463898753
+                        url: http://localhost/file.pdf
+                        fileName: informe1234
+                        fileExtension: pdf
+                        template:
+                          name: BULKATTCHTMP001
+                        metadata:
+                          - key: Meses
+                            value: '12'
+                    customMetadata:
+                      - key: Fruta
+                        value: Naranja
+                  emails:
+                    - from:
+                        name: Nombre Apellido
+                        emailAddress: cuentaorigen1@dominio.com
+                      to:
+                        - name: Nombre Apellido
+                          emailAddress: cuentadestino1@dominio.com
+                      cc:
+                        - name: Nombre Apellido
+                          emailAddress: cuentadestino1@dominio.com
+                      bcc:
+                        - name: Nombre Apellido
+                          emailAddress: cuentadestino1@dominio.com
+                      subject:
+                        subject: Asunto de prueba
+                        template:
+                          name: BULKSUBJTMP001
+                        metadata:
+                          - key: Categoria
+                            value: Tarjetas
+                      body:
+                        body: <p>Body de prueba</p>
+                        template:
+                          name: BULKBODYTMP001
+                        metadata:
+                          - key: Key1
+                            value: Key1Value
+                      attachments:
+                        - name: ABC058463898753
+                          url: http://localhost/file.pdf
+                          fileName: informe1234
+                          fileExtension: pdf
+                          template:
+                            name: BULKATTCHTMP001
+                          metadata:
+                            - key: Meses
+                              value: '12'
+                      customMetadata:
+                        - key: Mes
+                          value: Enero
+                smsChannel:
+                  bulkSms:
+                    body:
+                      body: <p>Body de prueba</p>
+                      template:
+                        name: BULKBODYTMP001
+                      metadata:
+                        - key: Key1
+                          value: Key1Value
+                        - key: Key2
+                          value: Juan
+                    customMetadata:
+                      - key: Mes
+                        value: Mayo
+                      - key: Dia
+                        value: Jueves
+                  sms:
+                    - phoneNumber: '888888'
+                      body:
+                        body: <p>Body de prueba</p>
+                        template:
+                          name: BULKBODYTMP001
+                        metadata:
+                          - key: Pais
+                            value: Costa Rica
+                          - key: Provincia
+                            value: San Jose
+                      customMetadata:
+                        metadata:
+                          - key: CustomMonth
+                            value: December
+                          - key: CustomDay
+                            value: Monday
+                    - phoneNumber: '9999999'
+                      body:
+                        body: <p>Body de prueba 99999</p>
+                        template:
+                          name: BULKBODYTMP001
+                        metadata:
+                          - key: Pais
+                            value: Nicaragua
+                          - key: Provincia
+                            value: Managua
+                      customMetadata:
+                        metadata:
+                          - key: CustomMonth
+                            value: January
+                          - key: CustomDay
+                            value: Friday
+      responses:
+        '200':
+          description: Respuesta exitosa
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendCorrespondence_Response_200_01'
+        '400':
+          description: Respuesta fallida por error controlado.
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_400_01'
+  /correspondences/get-statistics:
+    post:
+      summary: GetCorrespondenceStatistics
+      description: Obtiene las estadísticas de un envío de correspondencia
+      operationId: GetCorrespondenceStatistics
+      tags:
+        - Correspondence
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Idioma
+          required: true
+          schema:
+            enum:
+              - es
+              - en
+              - es-CR
+              - es-NI
+              - es-GT
+              - es-HN
+              - es-PA
+              - es-DO
+              - es-SV
+              - es-KY
+              - es-EC
+              - en-CR
+              - en-NI
+              - en-GT
+              - en-HN
+              - en-PA
+              - en-DO
+              - en-SV
+              - en-KY
+              - en-EC
+            type: string
+        - name: X-Origin-IP-Address
+          in: header
+          description: IP que originó el request al servicio.
+          required: true
+          schema:
+            type: string
+            format: ipv4, ipv6
+        - name: X-Subscription-Id
+          in: header
+          description: Identificador del sistema.
+          required: true
+          schema:
+            type: string
+        - name: X-Transaction-Id
+          in: header
+          description: Identificador único de la transacción.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 38
+        - name: X-User-Code
+          in: header
+          description: Código de usuario que utiliza el cliente que realiza el request. O bien, valores que permitan identificar usuario (persona o sistema) de una solicitud.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 50
+        - name: X-Origin-Country
+          in: header
+          description: Código de país a 2 caracteres según estándar ISO 3166-1 alfa-2.
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            enum:
+              - CR
+              - NI
+              - GT
+              - HN
+              - PA
+              - DO
+              - SV
+              - KY
+              - EC
+        - name: X-Origin-MachineName
+          in: header
+          description: Nombre del servidor/maquina en donde se inicia el request.
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 255
+        - name: X-Point-Coordinates
+          in: header
+          description: Localización en donde el usuario final realiza el evento. El formato esperado es GPS ISO 6709.
+          required: false
+          schema:
+            type: string
+            minLength: 20
+            maxLength: 23
+      requestBody:
+        content:
+          application/json:
+            schema:
+               type: object
+               properties:
+                 id:
+                  $ref: '#/components/schemas/Default_Correspondence_Id'
+      responses:
+        "200":
+          description: Respuesta Exitosa
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC
+          content:
+            application/json:
+              schema:
+                required:
+                  - Data
+                type: object
+                properties:
+                  Data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      startDate:
+                        type: string
+                      endDate:
+                        type: string
+                      emailStatistics:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          processed:
+                            type: number
+                          successfull:
+                            type: number
+                          pending:
+                            type: number
+                          error:
+                            type: number
+                          warning:
+                            type: number                        
+                      smsStatistics:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                          processed:
+                            type: number
+                          successfull:
+                            type: number
+                          pending:
+                            type: number
+                          error:
+                            type: number
+                          warning:
+                            type: number
+        "400":
+          description: Respuesta fallida por error controlado.
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC                            
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response_400_01'
+  /correspondences/logs/get-by-provider-sid:
+    post:
+      summary: GetLogsByProviderSid
+      description: Obtiene los logs del proveedor de envío de correspondencia
+      operationId: GetLogsByProviderSid
+      tags:
+        - Correspondence
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Idioma
+          required: true
+          schema:
+            enum:
+              - es
+              - en
+              - es-CR
+              - es-NI
+              - es-GT
+              - es-HN
+              - es-PA
+              - es-DO
+              - es-SV
+              - es-KY
+              - es-EC
+              - en-CR
+              - en-NI
+              - en-GT
+              - en-HN
+              - en-PA
+              - en-DO
+              - en-SV
+              - en-KY
+              - en-EC
+            type: string
+        - name: X-Origin-IP-Address
+          in: header
+          description: IP que originó el request al servicio.
+          required: true
+          schema:
+            type: string
+            format: ipv4, ipv6
+        - name: X-Subscription-Id
+          in: header
+          description: Identificador del sistema.
+          required: true
+          schema:
+            type: string
+        - name: X-Transaction-Id
+          in: header
+          description: Identificador único de la transacción.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 38
+        - name: X-User-Code
+          in: header
+          description: Código de usuario que utiliza el cliente que realiza el request. O bien, valores que permitan identificar usuario (persona o sistema) de una solicitud.
+          required: true
+          schema:
+            type: string
+            minLength: 5
+            maxLength: 50
+        - name: X-Origin-Country
+          in: header
+          description: Código de país a 2 caracteres según estándar ISO 3166-1 alfa-2.
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            enum:
+              - CR
+              - NI
+              - GT
+              - HN
+              - PA
+              - DO
+              - SV
+              - KY
+              - EC
+        - name: X-Origin-MachineName
+          in: header
+          description: Nombre del servidor/maquina en donde se inicia el request.
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 255
+        - name: X-Point-Coordinates
+          in: header
+          description: Localización en donde el usuario final realiza el evento. El formato esperado es GPS ISO 6709.
+          required: false
+          schema:
+            type: string
+            minLength: 20
+            maxLength: 23
+      requestBody:
+        content:
+          application/json:
+            schema:
+               type: object
+               properties:
+                 providerSid:
+                  type: string
+                  example: <14c5d75ce93.dfd.64b469@ismtpd-555>
+      responses:
+        "200":
+          description: Respuesta Exitosa
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC
+          content:
+            application/json:
+              schema:
+                required:
+                  - Data
+                type: object
+                properties:
+                  Data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      providerName:
+                        type: string
+                      channel:
+                        type: string
+                      date:
+                        type: string
+                      providerSid:
+                        type: string
+                      body:
+                        type: object
+                        additionalProperties:
+                          type: string
+        "400":
+          description: Respuesta fallida por error controlado.
+          headers:
+            X-Response-MachineName:
+              description: Nombre del servidor en donde se procesa el request.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 255
+                example: machine_name_01
+            X-Response-IP-Address:
+              description: Dirección IP en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 7
+                maxLength: 45
+                format: ipv4, ipv6
+                example: 10.130.23.4, ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190
+            X-Response-Url:
+              description: Url en donde se procesó el request.
+              schema:
+                type: string
+                minLength: 8
+                maxLength: 2000
+                format: url
+                example: http://darkblik/api/v1/pkg/proc
+            X-Response-Time:
+              description: Duración de la ejecución en milisegundos.
+              schema:
+                type: string
+                minLength: 3
+                maxLength: 8
+                example: 120ms
+            X-Origin-Country:
+              description: Código de país a 2 caracteres segun estandar ISO 3166-1 alfa-2.
+              schema:
+                type: string
+                minLength: 2
+                maxLength: 2
+                enum:
+                  - CR
+                  - NI
+                  - GT
+                  - HN
+                  - PA
+                  - DO
+                  - SV
+                  - KY
+                  - EC
+
+components:
+  schemas:
+    # ---------------------------- #
+    # ---- Request & Response ---- #
+    # ---- Nomenclatura Request: Operacion_Request_Consecutivo (00) ---- #
+    # ---- Nomenclatura Response: [Operacion_]Response_HttpCode_Consecutivo (00) ---- #
+    SendCorrespondence_Request_01:
+      required:
+        - correspondence
+      type: object
+      properties:
+        systemModuleCode:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Código del módulo del sistema que envía la solicitud.
+          example: AC
+        correspondence:
+          type: object
+          properties:
+            emailChannel:
+              required:
+                - emails
+              type: object
+              properties:
+                bulkEmail:
+                  type: object
+                  properties:
+                    from:
+                      $ref: '#/components/schemas/Email_ContactInformation'
+                    subject:
+                      $ref: '#/components/schemas/Email_Subject'
+                    body:
+                      $ref: '#/components/schemas/Correspondence_Body'
+                    customMetadata:
+                      description: 
+                      $ref: '#/components/schemas/Metadata'
+                    attachments:
+                      $ref: '#/components/schemas/Email_Attachments'
+                  description: Datos que se adjuntan en la lista de correos si sus campos correspondientes están vacíos.
+                emails:
+                  type: array
+                  items:
+                    required:
+                      - to
+                    type: object
+                    properties:
+                      from:
+                        $ref: '#/components/schemas/Email_ContactInformation'
+                      to:
+                        $ref: '#/components/schemas/Email_ContactsInformation'
+                      cc:
+                        $ref: '#/components/schemas/Email_ContactsInformation'
+                      bcc:
+                        $ref: '#/components/schemas/Email_ContactsInformation'
+                      subject:
+                        $ref: '#/components/schemas/Email_Subject'
+                      body:
+                        $ref: '#/components/schemas/Correspondence_Body'
+                      attachments:
+                        $ref: '#/components/schemas/Email_Attachments'
+                  description: Lista de correos que serán enviados. Si hay campos vacíos serán reemplazados por los correspondientes en la estructura 'bulkEmail'.
+              description: Estructura para envío de correos electrónicos.
+            smsChannel:
+              type: object
+              properties:
+                bulkSms:
+                  type: object
+                  properties:
+                    body:
+                      $ref: '#/components/schemas/Correspondence_Body'
+                    customMetadata:
+                      descripción: Información personalizada que requiera enviar el consumidor para registro en bitácora o control del proceso.
+                      $ref: '#/components/schemas/Metadata'
+                  description: Datos que se adjuntan en la lista de mensajes SMS si sus campos correspondientes están vacíos.
+                sms:
+                  type: array
+                  items:
+                    required:
+                      - phoneNumber
+                      - body
+                    type: object
+                    properties:
+                      phoneNumber:
+                        type: string
+                      body:
+                        $ref: '#/components/schemas/Correspondence_Body'
+                      customMetadata:
+                        descripción: Información personalizada que requiera enviar el consumidor para registro en bitácora o control del proceso. 
+                        $ref: '#/components/schemas/Metadata'
+                  description: Lista de SMS que serán enviados. Si hay campos vacíos serán reemplazados por los correspondientes en la estructura 'bulkSms'.
+      description: Estructura de solicitud para envío de correspondencia por uno o más canales.
+    SendCorrespondence_Response_200_01:
+      required:
+        - Data
+        - Links
+        - Meta
+      type: object
+      properties:
+        Data:
+          required:
+            - correspondence
+          type: object
+          properties:
+            correspondence:
+              $ref: '#/components/schemas/Correspondence_Id'
+          description: Objeto que contiene los datos de la respuesta.
+        Links:
+          required:
+            - Self
+          type: object
+          properties:
+            Self:
+              maxLength: 500
+              minLength: 1
+              type: string
+              description: Enlace de la pagina actual.
+              example: http://api.pfcti.net/services/correspondence/api/channels/all/send
+          description: Objeto con enlaces para trabajar con el recurso.
+        Meta:
+          type: object
+          properties:
+            TotalPages:
+              minimum: 1.0
+              type: integer
+              description: Cantidad de páginas totales que devuelve el servicio según parámetro de entrada de 'limit'.
+          description: Contiene metadata relacionada con la respuesta del servicio
+      description: Se espera un código HTTP 200 OK como resultado de la operación.
+      example:
+        Data:
+          correspondence:
+            id: a9a72ec0-a51e-11eb-9bbc-cb487d5f5c37
+        Links:
+          Self: http://api.pfcti.net/services/correspondence/api/channels/all/send
+        Meta:
+          TotalPages: 1
+    Response_200_01:
+      required:
+        - Data
+        - Links
+        - Meta
+      type: object
+      properties:
+        Data:
+          type: object
+          description: Objeto que contiene los datos de la respuesta.
+        Links:
+          required:
+            - Self
+          type: object
+          properties:
+            Self:
+              maxLength: 500
+              minLength: 1
+              type: string
+              description: Enlace de la pagina actual.
+              example: http://api.pfcti.net/services/service-domain/api/resources
+          description: Objeto con enlaces para trabajar con el recurso.
+        Meta:
+          type: object
+          properties:
+            TotalPages:
+              minimum: 1.0
+              type: integer
+              description: Cantidad de páginas totales que devuelve el servicio según parámetro de entrada de 'limit'.
+          description: Contiene metadata relacionada con la respuesta del servicio
+      description: Se espera un código HTTP 200 OK como resultado de la operación.
+      example:
+        Data:
+          correspondence:
+            id: a9a72ec0-a51e-11eb-9bbc-cb487d5f5c37
+        Links:
+          Self: http://api.pfcti.net/services/correspondence/api/channels/all/send
+        Meta:
+          TotalPages: 1
+    Response_400_01:
+      required:
+        - Code
+        - Id
+        - Message
+      type: object
+      properties:
+        Code:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: Corresponde al HTTP Status Code resultante de la ejecución del servicio.
+        Message:
+          maxLength: 200
+          minLength: 1
+          type: string
+          description: Mensaje en lenguaje de alto nivel donde se expresa una descripción del error presentado.
+        Id:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: 'Identificador único del evento de error presentado, normalmente relacionado a un registro en bitácora de errores para darle trazabilidad al soporte de la aplicación.'
+        Errors:
+          type: array
+          items:
+            required:
+              - Path
+              - Message
+              - ErrorCode
+              - Url
+            type: object
+            properties:
+              Path:
+                maxLength: 200
+                minLength: 1
+                type: string
+                description: Hace referencia al path del campo en el JSON que contiene el error.
+              Message:
+                maxLength: 1000
+                minLength: 1
+                type: string
+                description: 'Mensaje de índole técnica relacionada al error presentado, si se tiene un stacktrace debe agregarse como valor para esta llave.'
+              ErrorCode:
+                maxLength: 50
+                minLength: 1
+                type: string
+                description: 'Código de error específico devuelto por el sistema, en caso de error no controlado que no muestre dicho código, se omite el llenado de este valor para dicha llave.'
+                example: '50685489'
+              Url:
+                maxLength: 500
+                minLength: 1
+                type: string
+                description: Hace referencia a documentación del error especifico o bien documentación del API.
+          description: Lista de errores registrados durante el procesamiento del request.
+      description: Respuesta fallida por error controlado.
+
+    # ------------------ #
+    # ---- Entities ---- #
+    # ---- Nomenclatura: Entidad[_Parametro1_Parametro2_ParametroN] ---- #
+    # ----               . Se usa la entidad sola cuando contiene todas sus propiedades ---- #
+    Correspondence_Body:
+      type: object
+      properties:
+        body:
+          maxLength: 384000
+          minLength: 1
+          type: string
+          description: Cuerpo del mensaje que se va a enviar
+        template:
+          $ref: '#/components/schemas/Template_Name'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+      description: Estructura para envío del body de la correspondencia.
+      example:
+        body: <p>Body de prueba</p>
+        template:
+          name: BULKBODYTMP001
+        metadata:
+          - key: Key1
+            value: Key11111
+          - key: Key2
+            value: Value22222
+    Correspondence_Id:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Default_Correspondence_Id'
+    Email_Attachments:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: Nombre con el que se enviará el archivo adjunto en el correo electrónico. Sin extensión.
+          url:
+            maxLength: 500
+            minLength: 1
+            type: string
+            description: Dirección donde se encuentra almacenado el archivo que se va a adjuntar en el correo electrónico.
+          fileName:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: Nombre del archivo que está almacenado en el servidor y que será adjuntado al correo electrónico. Sin extensión.
+          fileExtension:
+            maxLength: 5
+            minLength: 1
+            type: string
+            description: Extensión del archivo que se va a adjuntar en el correo electrónico masivo.
+          template:
+            $ref: '#/components/schemas/Template_Name'
+          metadata:
+            $ref: '#/components/schemas/Metadata'
+      description: Estructura para envío de archivos adjuntos en correo electrónico.
+      example:
+        - name: ABC058463898753
+          url: http://localhost/file.pdf
+          fileName: informe1234
+          fileExtension: pdf
+          template:
+            name: BULKATTCHTMP001
+          metadata:
+            - key: Meses
+              value: '12'
+    Email_ContactInformation:
+      type: object
+      description: Información de un contacto que envía o recibe correos electrónicos.
+      required:
+          - emailAddress
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Nombre del remitente del correo electrónico.
+        emailAddress:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Dirección de correo electrónico del remitente del correo electrónico a enviar.
+          format: email
+      example:
+        name: Juan Pérez
+        emailAddress: correo@dominio.com
+    Email_ContactsInformation:
+      type: array
+      items:
+        $ref: '#/components/schemas/Email_ContactInformation'
+      description: Información de los contactos que envían o reciben correos electrónicos.
+      example:
+        - name: Juan Pérez
+          emailAddress: juanperez@dominio.com
+        - name: Juan Vargas
+          emailAddress: juanvargas@dominio.com
+    Email_Subject:
+      required:
+        - subject
+      type: object
+      properties:
+        subject:
+          maxLength: 150
+          minLength: 1
+          type: string
+          description: Asunto del correo
+        template:
+          $ref: '#/components/schemas/Template_Name'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+      description: Estructura para envío de datos del subject con o sin plantilla.
+      example:
+        subject: Asunto de prueba
+        template:
+          name: BULKBODYTMP001
+        metadata:
+          - key: Key1
+            value: Key1Value
+          - key: Key2
+            value: Juan
+    Metadata:
+      type: array
+      items:
+        required:
+          - key
+          - value
+        type: object
+        properties:
+          key:
+            maxLength: 100
+            minLength: 1
+            type: string
+            description: Es la llave del metadato que se va a reemplazar en la plantilla.
+          value:
+            maxLength: 4000
+            minLength: 1
+            type: string
+            description: Es valor del metadato que se va a reemplazar en la plantilla.
+      description: Lista de metadatos para reemplazar en la plantilla.
+      example:
+        - key: Key1
+          value: Key1Value
+        - key: Key2
+          value: Juan
+    Template_Name:
+      type: object
+      properties:
+        name:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Nombre de la plantilla.
+      description: Definición estándar de campos de correspondencia que requieran manejo de plantillas.
+      example:
+        name: BULKBODYTMP001
+
+    # ------------------ #
+    # ---- Definiciones Default ---- #
+    # ---- Nomenclatura: Default_[Concepto] ---- #
+    # ----               . Son definiciones estándar que pueden reutilizarse en muchas entidades ---- #
+
+    Default_Correspondence_Id:
+      maxLength: 50
+      minLength: 1
+      type: string
+      description: Identificador del proceso con el que se realizó el envío de la correspondencia.
+      format: uuid
+      example: a9a72ec0-a51e-11eb-9bbc-cb487d5f5c37
+
+  securitySchemes:
+    basicAuth:
+      description: En el header 'Authorization' se envia 'Basic Key:Secret' donde 'Key:Secret' en Base64. Por ejemplo, para autorizarse como 'demo / p@55w0rd' se envía 'Basic ZGVtbzpwQDU1dzByZA==' en el header indicado.
+      type: http
+      scheme: basic
+security:
+  - basicAuth: []
