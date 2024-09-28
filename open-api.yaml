@@ -1,0 +1,1011 @@
+openapi: 3.0.1
+info:
+  title: VCAS - Grupo Promerica Service
+  description: 
+    This document provides a user-friendly file format for viewing and implementing VCAS RDX API requests and responses including Stepup, InitateAction
+  version: 1.0.0
+  contact:
+    name: '############'
+    url: 'https://pfctigatewaydev.pfcti.com/'
+paths:
+  /stepup:
+    post:
+      tags:
+        - VCAS Authentication
+      summary: This message is used when Stepup authentication is required based on the RiskRequest and Response.
+      description: 'The Stepup request is communicated by the VCAS platform to the partner, and the partner responds with parameters necessary for VCAS to perform the stepup challenge.'
+      operationId: stepup
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Idioma
+          required: true
+          schema:
+            enum:
+              - es
+              - en
+              - es-CR
+              - es-NI
+              - es-GT
+              - es-HN
+              - es-PA
+              - es-DO
+              - es-SV
+              - es-KY
+              - es-EC
+              - en-CR
+              - en-NI
+              - en-GT
+              - en-HN
+              - en-PA
+              - en-DO
+              - en-SV
+              - en-KY
+              - en-EC
+            type: string
+          example: es-NI
+        - name: Origin-IP-Address
+          in: header
+          description: IP que originó el request al servicio.
+          schema:
+            type: string
+            format: ipv4, ipv6
+          example: 192.168.1.57
+        - name: Subscription-Id
+          in: header
+          description: Identificador del sistema.
+          schema:
+            type: string
+          example: NI10100010001FA25684685245836
+        - name: Origin-Country
+          in: header
+          description: Código de país a 2 caracteres según estándar ISO 3166-1 alfa-2.
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            enum:
+              - CR
+              - NI
+              - GT
+              - HN
+              - PA
+              - DO
+              - SV
+              - KY
+              - EC
+          example: NI
+      requestBody:
+        description: Stepup Request Object
+        content:
+          application/json:            
+            schema:
+              $ref: '#/components/schemas/StepupRequest'     
+        required: true
+      responses:
+        '200':
+          description: Successful Stepup Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepupResponse'       
+        '405':
+          description: Invalid input
+  /initiateaction:
+    post:
+      tags:
+        - VCAS Authentication
+      summary: This message is used to tell the partner to initate an action.
+      description: 'The InitiateAction request is used to signal to the partner to take action on an item.'
+      operationId: initiateaction
+      parameters:
+        - name: Accept-Language
+          in: header
+          description: Idioma
+          required: true
+          schema:
+            enum:
+              - es
+              - en
+              - es-CR
+              - es-NI
+              - es-GT
+              - es-HN
+              - es-PA
+              - es-DO
+              - es-SV
+              - es-KY
+              - es-EC
+              - en-CR
+              - en-NI
+              - en-GT
+              - en-HN
+              - en-PA
+              - en-DO
+              - en-SV
+              - en-KY
+              - en-EC
+            type: string
+          example: es-NI
+        - name: Origin-IP-Address
+          in: header
+          description: IP que originó el request al servicio.
+          schema:
+            type: string
+            format: ipv4, ipv6
+          example: 192.168.1.57
+        - name: Subscription-Id
+          in: header
+          description: Identificador del sistema.
+          schema:
+            type: string
+          example: NI10100010001FA25684685245836
+        - name: Origin-Country
+          in: header
+          description: Código de país a 2 caracteres según estándar ISO 3166-1 alfa-2.
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            enum:
+              - CR
+              - NI
+              - GT
+              - HN
+              - PA
+              - DO
+              - SV
+              - KY
+              - EC
+          example: NI      
+      requestBody:
+        description: InitiateAction Request Object
+        content:
+          application/json:            
+            schema:
+              $ref: '#/components/schemas/InitiateActionRequest'      
+        required: true   
+      responses:
+        '200':
+          description: Successful Initiate Action Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiateActionResponse'       
+        '405':
+          description: Invalid input                               
+components:
+  schemas:
+    MerchantInfo:
+      type: object
+      required:
+        - MerchantURL
+      properties:
+        AcquirerId:
+          type: string
+          description: AcquirerId for the merchant performing the purchase request. Up to 11 characters.
+        AcquirerCountryCode:
+          type: string
+          description: 'Country code of the Acquirer. ISO 3166-1 Numeric format. Issuers need to be aware of the acquirer country code when the acquirer country differs from the merchant country and the acquirer is in the EEA (this could mean that the transaction is covered by PSD2). Note: Currently only available on Mastercard EMV 3DS transactions where extension data is present. Will be available in future EMV versions.'
+          maximum: 3
+          example: '840'
+        MerchantId:
+          type: string
+          description: MerchantId for the merchant performing the purchase request.
+          maximum: 35
+        MerchantName:
+          type: string
+          description: Merchant Name for the merchant performing the purchase request. Max. 40 characters.
+        MerchantURL:
+          type: string
+          description: URL or App Name for the merchant's website or app. Max. 2048 characters.
+        MerchantCategoryCode:
+          type: string
+          description: Code used to describe the merchant's type of business product or service.'
+          maximum: 4
+        MerchantCountryCode:
+          type: string
+          description: 'Country code of the merchant. For 3DS1 transactions this value is alpha-2 format e.g. US. For 3DS2 transactions this value is numeric-3 format e.g. 840.'
+          maximum: 3
+    MerchantAppRedirectURLInfo:
+      type: object
+      required:
+        - MerchantURL
+      properties:
+        AcquirerId:
+          type: string
+          description: AcquirerId for the merchant performing the purchase request. Up to 11 characters.
+        AcquirerCountryCode:
+          type: string
+          description: 'Country code of the Acquirer. ISO 3166-1 Numeric format. Issuers need to be aware of the acquirer country code when the acquirer country differs from the merchant country and the acquirer is in the EEA (this could mean that the transaction is covered by PSD2). Note: Currently only available on Mastercard EMV 3DS transactions where extension data is present. Will be available in future EMV versions.'
+          maximum: 3
+          example: '840'
+        MerchantId:
+          type: string
+          description: MerchantId for the merchant performing the purchase request.
+          maximum: 35
+        MerchantName:
+          type: string
+          description: Merchant Name for the merchant performing the purchase request. Max. 40 characters.
+        MerchantURL:
+          type: string
+          description: URL or App Name for the merchant's website or app. Max. 2048 characters.
+        MerchantCategoryCode:
+          type: string
+          description: >-
+            Code used to describe the merchant's type of business product or service.
+          maximum: 4
+        MerchantCountryCode:
+          type: string
+          description: >-
+            Country code of the merchant. For 3DS1 transactions this value is alpha-2 format e.g. US. For 3DS2 transactions this value is numeric-3 format e.g. 840.
+          maximum: 3
+        MerchantAppRedirectURL:
+          type: string
+          description: >-
+            Merchant app declaring their URL within the CReq message so that the Authentication app can call the Merchant app after OOB authentication has occurred. Each transaction requires a unique Transaction ID by using the SDK Transaction ID. Example: merchantScheme://appName?transID=b2385523-a66c-4907-ac3c-91848e8c0067.
+          maximum: 256
+    PaymentInfo:
+      type: object
+      required:
+        - CardNumber
+        - CardExpiryMonth
+        - CardExpiryYear
+      properties:
+        CardNumber:
+          type: string
+          description: Payment card number used in transaction. Length - between 13 and 19 characters.
+        CardExpiryMonth:
+          type: string
+          description: Expiration month
+          minimum: 2
+          maximum: 2
+        CardExpiryYear:
+          type: string
+          description: "Expiration year. For 3DS1 Transactions this value is 4-digits e.g. 2023. For 3DS2 Transactions this value is 2-digits e.g. 23."
+          maximum: 4
+        CardType:
+          type: string
+          description: Card or account type e.g. Debit or Credit.
+          enum:
+            - Credit
+            - Debit
+            - NotApplicable
+        CardHolderName:
+          type: string
+          description: Name of the cardholder. Max. 45 characters.
+    Address:
+      type: object
+      required:
+        - FirstName
+        - LastName
+      properties:
+        FirstName:
+          type: string
+          description: First Name for the Address Component.
+          maximum: 64
+        MiddleName:
+          type: string
+          description: Middle Name for the Address Component.
+          maximum: 64
+        LastName:
+          type: string
+          description: Last Name for the Address Component.
+          maximum: 64
+        Address1:
+          type: string
+          description: Address Line 1.
+          maximum: 128
+        Address2:
+          type: string
+          description: Address Line 2.
+          maximum: 128
+        Address3:
+          type: string
+          description: Address Line 3.
+          maximum: 128
+        Locality:
+          type: string
+          description: 'City, Town, etc.'
+          maximum: 128
+        Region:
+          type: string
+          description: 'State, Province, Territory, etc.'
+          maximum: 64
+        PostalCode:
+          type: string
+          description: Postal Code. 
+          maximum: 32
+        CountryCode:
+          type: string
+          description: Country Code Format will follow [ISO 3166-1 three digit numeric] 3 characters.
+          maximum: 3
+    CartItem:
+      properties:
+        Name:
+          type: string
+          description: Name of the item in the shopping cart. Max. 50 characters.
+        SKU:
+          type: string
+          description: Product SKU. Max. 50 characters.
+        Price:
+          type: string
+          description: Item price. Max. 48 characters.
+        Quantity:
+          type: string
+          description: Item quantity in this cart. Length - 2 characters.
+    ConsumerContact:
+      properties:
+        EmailAddress:
+          type: string
+          description: Email address for the consumer. Max. 254 characters.
+          format: email
+          maximum: 254
+        PhoneNumber:
+          type: string
+          description: Phone number for the consumer. Max. 15 characters.
+          maximum: 15
+        MobileNumber:
+          type: string
+          description: Consumer's mobile number. Max. 15 characters.
+          maximum: 15
+        WorkNumber:
+          type: string
+          description: Work phone number for the cardholder. Max. 15 characters.
+          maximum: 15
+    WalletInfo:
+      properties:
+        Provider:
+          type: string
+          description: Wallet provider name. Max. 100 characters.
+        WalletAge:
+          type: number
+          format: Int64
+          description: Number of days since the wallet was created.
+          minimum: 0
+          maximum: 10000
+        PaymentCardAge:
+          type: number
+          format: Int64
+          description: Number of days the card has been in the wallet.
+          minimum: 0
+          maximum: 10000
+    MerchantAdditionalData:
+      type: object
+      properties:
+        ShippingIndicator:
+          type: string
+          description: Indicates shipping method chosen for transaction.
+          enum:
+            - ShipToBillingAddress
+            - ShipToVerifiedAddress
+            - ShipToOtherAddress
+            - ShipToStore
+            - DigitalGoods
+            - TravelOrEventTickets
+            - Other
+        DeliveryTimeFrame:
+          type: string
+          description: Deilvery timeframe.
+          enum: 
+            - ElectronicDelivery
+            - SameDayShipping
+            - OvernightShipping
+            - TwoOrMoreDaysShipping
+        DeliveryEmailAddress:
+          type: string
+          description: Email address where merchandise was delivered. Max. 254 characters.
+        ReorderItemsIndicator:
+          type: string
+          description: Indicates whether cardholder ordered previously.
+          enum:
+            - FirstTime
+            - Reordered
+        PreorderPurchaseIndicator:
+          type: string
+          description: Indicates purchase with future availability.
+          enum:
+            - MerchandiseAvailable
+            - FutureAvailability
+        PreorderDate:
+          type: string
+          description: Expected date merchandise is available. Format - YYYYMMDD. Length - 8 characters.
+        GiftCardAmount:
+          type: number
+          description: For a gift card, this is the purchase amount (represented in raw amount, example 1000 for $10.00). Max. 15 characters.
+        GiftCardCurrency: 
+          type: string
+          description: 'ISO 4217 3-digit numeric standard.[ISO 4217 Link] https://en.wikipedia.org/wiki/ISO_4217 Length - 3 characters.'
+        GiftCardCount:
+          type: number
+          description: Total count of individual prepaid or gift cards/codes purchased. Length - 2 characters.
+    Device:
+      properties:
+        UserAgent:
+          type: string
+          description: User Agent for browser or Device Identifier for InApp purchase. Max. 2048 characters.
+        IP:
+          type: string
+          description: IP Address of the device. Max. 45 characters.
+        Latitude:
+          type: string
+          description: Latitude of the device based on geolocation or IP Address. Max. 50 characters.
+        Longitude:
+          type: string
+          description: Longitude of the device based on geolocation or IP Address. Max. 50 characters.
+        BrowserAcceptHeader:
+          type: string
+          description: Raw HTTP Accept header from the browser. Max. 2048 characters.
+          maximum: 2048
+        BrowserJavaEnabled:
+          type: string
+          description: Indicates whether browser can execute Java. Example, true. Max. 5 characters.
+        BrowserJavascriptEnabled:
+          type: string
+          description: Indicates whether browser can execute Javascript. Example, true. Max. 5 characters.
+        BrowserLanguage:
+          type: string
+          description: Browser language returned from navigator language property. Max. 8 characters.
+          maximum: 8
+        BrowserColorDepth:
+          type: string
+          description: Value representing the bit depth of the color palette. Max. 2 characters.
+        BrowserScreenHeight:
+          type: string
+          description: Height of cardholder's screen in pixels. Max. 6 characters.
+          maximum: 6
+        BrowserWidth:
+          type: string
+          description: Width of cardholder's screen in pixels. Max. 6 characters.
+          maximum: 6
+        BrowserTimeZone:
+          type: string
+          description: >-
+            Time difference between UTC time and the cardholder's browser local
+            time, in minutes. From Date.getTimezoneOffset() method. Max. 5 characters.
+          maximum: 5
+        Platform:
+          type: string
+          description: 'Platform of the device. Example, Android, iOS. Max. 30 characters.'
+        DeviceModel:
+          type: string
+          description: Mobile device manufacture and model. Max. 25 characters.
+        OperatingSystemName:
+          type: string
+          description: Max. 50 characters.
+        OperatingSystemVersion:
+          type: string
+          description: Max. 25 characters.
+        Locale:
+          type: string
+          description: Device Locale from the browser header or from the app’s language settings. This value can be a single locale value or multiple concatenated together via commas. In 3DS1 this value will be directly from the browser’s “Accept-Language” header. However, in 3DS2 this is not available due to new flows so this will be a single language value following BCP 47 format e.g. en-US or en,es-PE;q=0.9,es;q=0.8
+          maximum: 2048
+        AdvertisingId:
+          type: string
+          description: Unique ID available for advertising and fraud detection purposes. Max. 128 characters.
+        ScreenResolution:
+          type: string
+          description: 'Pixel width and height. Example, 1080x1920. Max. 15 characters.'
+        DeviceName:
+          type: string
+          description: User assigned device name. Max. 50 characters.
+        SDKAppId:
+          type: string
+          description: Universally unique ID created upon all installations and upates of the 3DS Requestor App on a consumer device. Length - Up 36 characters.
+        DeviceExtendedData:
+          type: string
+          description: Base64url encoded JSON object. Device information gathered by 3DS SDK from a consumer device. Max. 64000'
+    StepupRequestTransactionInfo:
+      properties:
+        TransactionTimeStamp:
+          type: string
+          description: Transaction timestamp in UTC per ISO 8601 UTC. Length - 24 characters e.g 2023-03-21T20:55:49.000Z
+          format: date-time
+        TransactionAmount:
+          type: number
+          description: 'Transaction Amount (raw amount, example 1000 for $10.00). Max. 48 characters.'
+          format: decimal
+        TransactionCurrency:
+          type: string
+          description: >-
+            ISO 4217 3-digit numeric standard.[ISO 4217 Link]
+            https://en.wikipedia.org/wiki/ISO_4217 Length - 3 characters.
+        TransactionExponent:
+          type: integer
+          description: 'Exponent for formatting the given currency ISO 4217 code. Length - one character.'
+        TransactionType:
+          type: string
+          description: Type of the transaction.
+          enum:
+            - Purchase
+            - CardAdd
+        MandatedRegion:
+          type: string
+          description: 'A value describing the region in which mandates may apply to the current transaction. Added to support the new PSD2 transactions in the EEA. A value of EEA will denote that the transaction falls under the PSD2 mandates, otherwise the value will be null. Note - you must account for new values being added to this field over time due to new regulations being rolled out in other regions.'
+          enum:
+            - EEA
+            - NONE
+            - UNKNOWN
+        Channel:
+          type: string
+          description: Channel in which the transaction occurs.
+          enum:
+            - WEB
+            - APP
+            - MWEB
+            - THREERI
+    InitiateActionTransactionInfo:
+      properties:
+        TransactionTimeStamp:
+          type: string
+          description: Transaction timestamp in UTC per ISO 8601 UTC. Length - 24 characters. e.g 2023-03-21T20:55:49.000Z
+          format: date-time
+        TransactionAmount:
+          type: number
+          description: 'Transaction Amount (raw amount, example 1000 for $10.00). Length - up to 48 characters. Required for 02-NPA if 3DS Requestor Authentication Indicator = 02 or 03.'
+          format: decimal
+        TransactionCurrency:
+          type: string
+          description: >-
+            ISO 4217 3-digit numeric standard.[ISO 4217 Link]
+            https://en.wikipedia.org/wiki/ISO_4217 Length - 3 characters. Required for 02-NPA if 3DS Requestor Authentication Indicator = 02 or 03.
+        TransactionExponent:
+          type: integer
+          description: Exponent for formatting the given currency ISO 4217 code. Length - 1 character.
+        TransactionType:
+          type: string
+          description: Type of the transaction.
+          enum:
+            - Purchase
+            - CardAdd
+        MandatedRegion:
+          type: string
+          description: 'A value describing the region in which mandates may apply to the current transaction.  Added to support the new PSD2 transactions in the EEA. A value of EEA will denote that the transaction falls under the PSD2 mandates, otherwise the value will be null. Note - you must account for new values being added to this field over time due to new regulations being rolled out in other regions.'
+          enum:
+            - EEA
+            - NONE
+            - UNKNOWN
+        Channel:
+          type: string
+          description: Channel in which the transaction occurs.
+          enum:
+            - WEB
+            - APP
+            - MWEB
+            - THREERI
+    Credential:
+      required:
+        - Id
+        - Type
+      properties:
+        Id:
+          type: string
+          description: Identifier for the credential requested, this will be passed on the InitiateAction request as well as the ValidateRequest. Length will be 36 characters. The Id must be unique per credential object returned. The Id is used to distinguish the specific authenticate type in preceding InitiateAction and ValidateRequest calls.
+        Type:
+          type: string
+          description: Type of the Credential used for stepup, this is meta data and will not be used in any business logic
+          enum:
+            - OTPEMAIL
+            - OTPSMS
+            - OTPIVR
+            - KBASINGLE
+            - BIOMETRIC
+            - OUTOFBANDOTHER
+            - OUTOFBANDTOKEN
+        Text:
+          type: string
+          description: 'Dynamic data to be displayed to the cardholder i.e. masked phone number or email address. Note: certain browser screen templates will only be able to show a certain number of characters before showing an elipsis (...). Up to 35 characters. Note: in EMV SDK flows the text space is limited. Up to 40 characters.'
+    CredentialValidate:
+      properties:
+        Id:
+          type: string
+          description: Id value from the StepupResponse->Credential. Length will be 36 characters.
+        Type:
+          type: string
+          description: Type of the Credential used for stepup, this is meta data and will not be used in any business logic
+          enum:
+            - OTPEMAIL
+            - OTPSMS
+            - OTPIVR
+            - KBASINGLE
+            - BIOMETRIC
+            - OUTOFBANDOTHER
+            - OUTOFBANDTOKEN
+        Value:
+          type: string
+          description: Value provided by the cardholder.
+    ExemptionInfo:
+      description: 'Object containing information related to EMV exemptions as related to the EEA PSD2 regulations.'
+      properties:
+        MerchantFraudRate:
+          type: string
+          description: 'Merchant fraud rate in the EEA calculated as per PSD2 RTS. Note: Only Mastercard EMV 3DS transactions where extension data is present. Note: Mastercard will not calculate or validate the merchant fraud score.'
+          maximum: 2
+          example: '1'
+        SecureCorporatePayment:
+          type: string
+          description: 'Indicates dedicated payment processes and procedures were used, potential secure corporate payment exemption applies. Logically this field should only be set to yes if the acquirer exemption field is blank. A merchant cannot claim both acquirer exemption and secure payment. However, the DS will not validate the conditions in the extension. DS will pass data as presented. Possible values: "Y" or "N". Note: Only Mastercard EMV 3DS transactions where extension data is present.'
+          maximum: 1
+          example: 'Y'
+        WhitelistStatus:
+          type: string
+          description: 'Indicates current whitelist status as indicated by the 3DS Server and the DS on the authentication request. Note: EMV 3DS Transaction only.'
+          enum:
+            - Y
+            - N
+            - E
+            - P
+            - R
+            - U
+        WhitelistStatusSource:
+          type: string
+          description: 'Indicates where the source for whitelisting request. This will be the initial value sent to VCAS on the authentication request. Note: EMV 3DS Transaction only.'
+          enum:
+            - Merchant
+            - DS
+    ExemptionResponse:
+      description: 'Object containing any information related to the evaluation of the ExemptionInfo on the RiskRequest.'
+      properties:
+        WhitelistStatus:
+          type: string
+          description: 'Indicates whether the whitelist exemption was accepted. Should be used in conjunction with the RiskResponse.Status. Value can be left null if accepted or if not applicable to transaction.'
+          enum:
+            - Y
+            - N
+            - E
+            - P
+            - R
+            - U
+    MerchantAuthInfo:
+      description: 'Object containing information related to any Merchant Authentication information on EMV requests.'
+      properties:
+        DecoupledRequestIndicator:
+          type: string
+          description: 'Indicates whether the 3DS Requestor requests the ACS to utilise Decoupled Authentication and agrees to utilise Decoupled Authentication if the ACS confirms its use. Note: EMV 3DS 2.2 Only - ***Will be available at a later date***'
+          enum:
+            - DecoupledPreferred
+            - NoDecoupledPreferred
+        DecoupledMaxTime:
+          type: string
+          description: 'Indicates the maximum amount of time that the 3DS Requestor will wait for an ACS to provide the results of Decoupled Authentication transaction (in minutes). Numeric values between 1 and 10080 accepted. Note: EMV 3DS 2.2 Only - ***Will be available at a later date***'
+          maximum: 5
+    CardholderSelectionInfo:
+      description: 'Object defining the consumers selection during the Cardholder Selection OTP flow. This feature is only populated and enabled for Issuers supporting this flow.'
+      properties:
+        Type:
+          type: string
+          description: 'Type describing the cardholder selection e.g. Primary (P) or Secondary (S) cardholder.'
+          enum:
+            - P
+            - S
+        Name:
+          type: string
+          description: 'The name of the selected cardholder. Only needed if Secondary cardholder is selected to match against.'
+          maximum: 45
+    EmbeddedOOBResponseUrl:
+      type: string
+      description: 'The issuer must redirect to this URL when validation is complete, during an Embedded OOB challenge.'
+    Reason:
+      properties:
+        ReasonCode:
+          type: string
+          description: Used by the issuer for informational purposes. Max. 32 characters.
+        ReasonDescription:
+          type: string
+          description: Used by the issuer for informational purposes. Max. 256 characters.
+    WhyInfo:
+      description: 'Object defining dynamic text values that can be shown to the consumer during the challenge flow. These fields will be mapped directly to both browser templates and SDK info fields. Note: this field is also configurable for SDK screens today via our template configuration. If this value is passed on RDX it will override the current configurable value.'
+      properties:
+        Label:
+          type: string
+          description: 'Label to be displayed to the Cardholder for the "why" information section.'
+          maximum: 45
+        Text:
+          type: string
+          description: 'Text provided by the Issuer to be displayed to the Cardholder to explain why the Cardholder is being asked to perform the authentication task. Note: Carriage return is supported in this data element and is represented by an “\n”.'
+          maximum: 256
+    ErrorMessage:
+      type: object
+      properties:
+        ReferenceNumber:
+          type: string
+          description: System reference number for the error message. Max. 15 characters.
+        ReasonDescription:
+          type: string
+          description: Used by the issuer for informational purposes. Up to 256 characters.
+        Description:
+          type: string
+          description: A description of the error. Max. 50 characters.
+        Message:
+          type: string
+          description: A message that will be displayed to the customer on the error screen. Max. 100 characters.
+    RReqOverrides:
+        type: object
+        properties:
+          AuthenticationMethod:
+            type: string
+            description: Required authentication method for the RReq and Visa CAVV values.
+            enum:
+              - SMS_OTP
+              - HARDWARE_OTP
+              - SOFTWARE_OTP
+              - OTHER_OTP
+              - KBA
+              - BIOMETRIC
+              - APP_LOGIN
+              - OTHER
+          TransStatusReason:
+            type: string
+            description: Required when the transaction is not authenticated or when an error occurs in the OOB Embedded use case.
+            enum:
+              - CARD_AUTH_FAILED
+              - EXCEEDS_FREQUENCY
+              - TECHNICAL_ISSUE
+          AuthenticationAttempts:
+            type: string
+            description: Indicates the number of authentication cycles attempted by the cardholder. Max. 2 characters.
+          CustomerCancel:
+            type: boolean
+            description: Indicates whether the customer cancelled the transaction. True if the customer clicked "Cancel", otherwise false. Required for OOB Embedded use case.
+    StepupRequest:
+      type: object
+      required:
+        - ProcessorId
+        - IssuerId
+        - TransactionId
+        - StepupRequestId
+        - MessageVersion
+        - StepupCounter
+      properties:
+        ProcessorId:
+          type: string
+          description: Cardinal provided identifier for the partner. Max. 24 characters.
+        IssuerId:
+          type: string
+          description: Cardinal provided identifier for the partner. Max. 24 characters.
+        TransactionId:
+          type: string
+          description: 'VCAS generated transaction reference id. Max. 36 characters. 3DS 1.0.2 - 28 character alpha-numeric. EMV 3DS - 36 character GUID.'
+        DSTransactionId:
+          type: string
+          description: 'Directory Server (DS) generated transaction reference id. GUID Format. Note: EMV 3DS Transactions only.'
+          maximum: 36
+        StepupRequestId:
+          type: string
+          description: Unique identifier to identify the particular Stepup request. Length will be 36 characters.
+        StepupCounter:
+          type: integer
+          description: 'Counter for tracking the number of Stepups. Each stepup can go from Stepup -> InitiateAction -> Validate. If the user requests a "resend" via the browser templates it will initiate another Stepup request.'
+        DeviceLocale:
+          type: string
+          description: "Device Locale from the browser header or from the app’s language settings. This value can be a single locale value or multiple concatenated together via commas. In 3DS1 this value will be directly from the browser’s “Accept-Language” header. However, in 3DS2 this is not available due to new flows so this will be a single language value following BCP 47 format e.g. en-US or en,es-PE;q=0.9,es;q=0.8"
+          maximum: 2048
+        DeviceUserAgent:
+          type: string
+          description: "Device user agent from the browser header or the app's device identifier. Max. 2048 characters."
+        MessageVersion:
+          type: string
+          description: Version of the message based on 3DS spec. Examples - 1.0.2, 2.1.0, 2.2.0 
+          maximum: 8
+        RDXMessageVersion:
+          type: string
+          description: 'Version of the RDX protocol being used. This will be used to enable new features without breaking current integrations. Example: 2.2.1 and 2.2.2'
+          maximum: 8
+        StepupReason:
+          type: string
+          description: Used to identify the reason the Stepup request was initiated. Only available for Cardholder Resend, future values and scenarios may be added.
+          enum:
+            - CARDHOLDER_RESEND
+        MerchantInfo:
+          $ref: '#/components/schemas/MerchantAppRedirectURLInfo'
+        PaymentInfo:
+          $ref: '#/components/schemas/PaymentInfo'
+        TransactionInfo:
+          $ref: '#/components/schemas/StepupRequestTransactionInfo'
+        CardholderSelectionInfo:
+          $ref: '#/components/schemas/CardholderSelectionInfo'
+        EmbeddedOOBResponseUrlInfo:
+          $ref: '#/components/schemas/EmbeddedOOBResponseUrl'
+    StepupResponse:
+      type: object
+      required:
+        - ProcessorId
+        - IssuerId
+        - TransactionId
+        - StepupRequestId
+        - Credentials
+        - Status
+      properties:
+        ProcessorId:
+          type: string
+          description: Echoed from Request. Max. 24 characters.
+        IssuerId:
+          type: string
+          description: Echoed from Request. Max. 24 characters.
+        TransactionId:
+          type: string
+          description: Echoed from Request. Max. 36 characters.
+        StepupRequestId:
+          type: string
+          description: Echoed from Request. Length - 36 characters.
+        StepupType:
+          type: string
+          description: Used to identify what type of stepup.
+          enum:
+            - CHOICE
+            - OTP
+            - KBA
+            - BIOMETRIC
+            - OUTOFBAND
+            - OTP_AND_KBA
+            - OTP_CHOICE_AND_KBA
+            - OUTOFBAND_EMBEDDED
+        Language:
+          type: string
+          description: Language to display the instructions and prompt to the cardholder. This value will decide which template is loaded, provided the correct template language is available. If not provided, the language is selected based on Issuer configuration and browser preference e.g. en-US. Max. 8 characters.
+        Status:
+          type: string
+          description: ERROR is returned on any interal/technical issues. ATTEMPTS is only supported for 1.0.2 transactions. REJECTED is only supported for 2.x.x transactions. AUTHENTICATED will return a Y back to the merchant.
+          enum:
+            - SUCCESS
+            - AUTHENTICATED
+            - FAILURE
+            - FAILWITHFEEDBACK
+            - ERROR
+            - BLOCKED
+            - REJECTED
+            - ATTEMPTS
+            - INFORMATION ONLY
+        RiskIndicator:
+          type: string
+          description: |
+            If returned, this value will be used in the creation of certain Authentication Values (AV) for EMV 3DS. 
+
+            The value passed must conform to the current AV value the Issuer is using. This may also depend on the card brand of the transaction. For example, CAVV and IAV accept different values.
+
+            On Challenge responses (Stepup, Initiate, Validate) this value is currently ignored for CAVV usages in favor of mapping to the “Credential Type”. For Enhanced IAV SPA2 usage, if passed, this value will override the mapping to the “Credential Type”.
+
+            Note: This field is only available for EMV 3DS transactions and not available on 3DS 1 transactions.
+
+            Note: The value here will be converted to the Hexadecimal equivalent. Refer to the “VCAS Enhanced Authentication Value Support Guide” for details on supported authentication values.
+          maximum: 3
+        Credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/Credential'
+          minimum: 1
+        Reason:
+          $ref: '#/components/schemas/Reason'
+        Error:
+          $ref: '#/components/schemas/ErrorMessage'
+        WhyInfo:
+          $ref: '#/components/schemas/WhyInfo'
+    InitiateActionRequest:
+      type: object
+      required:
+        - ProcessorId
+        - IssuerId
+        - TransactionId
+        - StepupRequestId
+        - Credentials
+        - MessageVersion
+        - StepupCounter
+      properties:
+        ProcessorId:
+          type: string
+          description: Cardinal provided identifier for the partner. Max. 24 characters.
+        IssuerId:
+          type: string
+          description: Cardinal provided identifier for the partner. Max. 24 characters.
+        TransactionId:
+          type: string
+          description: 'VCAS generated transaction reference id. Max. 36 characters. 3DS 1.0.2 - 28 character alpha-numeric. EMV 3DS - 36 character GUID.'
+        DSTransactionId:
+          type: string
+          description: 'Directory Server (DS) generated transaction reference id. GUID Format. Note: EMV 3DS Transactions only.'
+          maximum: 36
+        StepupRequestId:
+          type: string
+          description: Unique identifier to identify the particular Stepup request. Length - 36 characters.
+        StepupType:
+          type: string
+          description: Used to identify what type of stepup.
+          enum:
+            - CHOICE
+            - OTP
+            - KBA
+            - BIOMETRIC
+            - OUTOFBAND
+            - OTP_AND_KBA
+            - OTP_CHOICE_AND_KBA
+        StepupCounter:
+          type: integer
+          description: 'Counter for tracking the number of Stepups. Each stepup can go from Stepup -> InitiateAction -> Validate. If the user requests a "resend" via the browser templates it will initiate another Stepup request.'
+        OtpReferenceCode:
+          type: string
+          description: 'This is a unique value generated with each new OTP value or “VerificationToken”. In the instance where the consumer can receive multiple OTPs for the same transaction, this can be leveraged to show the consumer which OTP the system is expecting to be entered. This value should be sent in the SMS or Email along with the VerificationToken and then displayed on the consumer screen.'
+        VerificationToken:
+          type: string
+          description: Token to be sent to cardholder.
+          maximum: 18
+        MessageVersion:
+          type: string
+          description: Version of the message based on 3DS spec. Examples - 1.0.2, 2.1.0, 2.2.0 
+          maximum: 8
+        RDXMessageVersion:
+          type: string
+          description: 'Version of the RDX protocol being used. This will be used to enable new features without breaking current integrations. Example: 2.2.1 and 2.2.2' 
+          maximum: 8
+        Credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/Credential'
+          minimum: 1
+        MerchantInfo:
+          $ref: '#/components/schemas/MerchantAppRedirectURLInfo'
+        PaymentInfo:
+          $ref: '#/components/schemas/PaymentInfo'
+        TransactionInfo:
+          $ref: '#/components/schemas/InitiateActionTransactionInfo'
+    InitiateActionResponse:
+      type: object
+      required:
+        - ProcessorId
+        - IssuerId
+        - TransactionId
+        - StepupRequestId
+        - Credentials
+        - Status
+      properties:
+        ProcessorId:
+          type: string
+          description: Echoed from  Request. Max. 24 characters.
+        IssuerId:
+          type: string
+          description: Echoed from  Request. Max. 24 characters.
+        TransactionId:
+          type: string
+          description: Echoed from  Request. Max. 36 characters.
+        StepupRequestId:
+          type: string
+          description: Echoed from  Request. Length - 36 characters.
+        Language:
+          type: string
+          description: Language to display the instructions and prompt to the cardholder. This value will decide which template is loaded, provided the correct template language is available. If not provided, the language is selected based on Issuer configuration and browser preference e.g. en-US. Max. 8 characters.
+        Status:
+          type: string
+          description: ERROR is returned on any interal/technical issues. ATTEMPTS is only supported for 1.0.2 transactions. REJECTED is only supported for 2.x.x transactions. AUTHENTICATED will return a Y back to merchant.
+          enum:
+            - SUCCESS
+            - AUTHENTICATED
+            - STEPUP
+            - FAILURE
+            - FAILWITHFEEDBACK
+            - ERROR
+            - BLOCKED
+            - REJECTED
+            - ATTEMPTS
+        RiskIndicator:
+          type: string
+          description: |
+            If returned, this value will be used in the creation of certain Authentication Values (AV) for EMV 3DS. 
+
+            The value passed must conform to the current AV value the Issuer is using. This may also depend on the card brand of the transaction. For example, CAVV and IAV accept different values.
+
+            On Challenge responses (Stepup, Initiate, Validate) this value is currently ignored for CAVV usages in favor of mapping to the “Credential Type”. For Enhanced IAV SPA2 usage, if passed, this value will override the mapping to the “Credential Type”.
+
+            Note: This field is only available for EMV 3DS transactions and not available on 3DS 1 transactions.
+
+            Note: The value here will be converted to the Hexadecimal equivalent. Refer to the “VCAS Enhanced Authentication Value Support Guide” for details on supported authentication values.
+          maximum: 3
+        Credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/Credential'
+          minimum: 1
+        Reason:
+          $ref: '#/components/schemas/Reason'
+        Error:
+          $ref: '#/components/schemas/ErrorMessage'
